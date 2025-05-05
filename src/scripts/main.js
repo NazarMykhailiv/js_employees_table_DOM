@@ -276,6 +276,10 @@ tbody.addEventListener('dblclick', (e) => {
     return;
   }
 
+  const row = cell.parentElement;
+  const cells = Array.from(row.children);
+  const cellIndex = cells.indexOf(cell);
+
   const initialValue = cell.textContent.trim();
 
   cell.textContent = '';
@@ -290,9 +294,35 @@ tbody.addEventListener('dblclick', (e) => {
   activeInput = input;
 
   const finishEdit = () => {
-    const newValue = input.value.trim();
+    let newValue = input.value.trim();
 
-    cell.textContent = newValue || initialValue;
+    if ((cellIndex === 0 || cellIndex === 1) && newValue.length < 4) {
+      newValue = initialValue;
+    }
+
+    if (cellIndex === 3) {
+      const num = Number(newValue);
+
+      if (isNaN(num) || num < 18 || num > 90) {
+        newValue = initialValue;
+      }
+    }
+
+    if (cellIndex === 4) {
+      const num = Number(newValue.replace(/[^0-9.-]+/g, ''));
+
+      if (isNaN(num) || num <= 0) {
+        newValue = initialValue;
+      } else {
+        newValue = `$${num.toLocaleString('en-US')}`;
+      }
+    }
+
+    if (newValue === '') {
+      newValue = initialValue;
+    }
+
+    cell.textContent = newValue;
     activeInput = null;
   };
 
